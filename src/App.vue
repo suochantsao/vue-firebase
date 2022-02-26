@@ -3,7 +3,8 @@
     <div id="nav">
       <button @click="writeUserData">新增使用者資料</button>
       <button @click="getUserData">讀取使用者資料</button>
-      <button @click="updateUserData">修改使用者資料</button>
+      <button @click="updateUserData">覆蓋原本使用者資料</button>
+      <button @click="updateParticularData">修改使用者資料</button>
       <button @click="delUserData">刪除使用者資料</button>
     </div>
   </div>
@@ -16,8 +17,8 @@ import {
   set,
   ref,
   onValue,
-  push,
-  child,
+  // push,
+  // child,
   update,
   remove,
 } from "firebase/database";
@@ -47,11 +48,6 @@ export default {
     writeUserData() {
       const db = getDatabase();
       set(ref(db), this.userData);
-      // set(ref(db, "/user"), {
-      //   Casper: {
-      //     email: "Casper@gmail.com",
-      //   },
-      // });
       console.log("新增使用者資料成功");
     },
     getUserData() {
@@ -60,22 +56,28 @@ export default {
       console.log(db);
       onValue(getData, (snapshot) => {
         const firebasedata = snapshot.val();
-        // this.initData = firebasedata;
         console.log(snapshot);
         console.log("讀取使用者資料成功", firebasedata);
       });
     },
     updateUserData() {
       const db = getDatabase();
-      const postData = {
-        Order: {
-          num: 1,
+      set(ref(db, "/user"), {
+        Charlie: {
+          email: "Charlie@gmail.com",
         },
-      };
-      const newPostKey = push(child(ref(db), "user")).key;
-      const updates = {};
-      updates[newPostKey] = postData;
+      });
+      console.log("修改使用者資料成功(取代整個子節點)");
+    },
+    updateParticularData() {
+      const db = getDatabase();
 
+      const userData = {
+        email: "Casper@gmail.com",
+      };
+      // const newUserKey = push(child(ref(db), "user")).key;
+      const updates = {};
+      updates["/user/" + "Casper"] = userData;
       return update(ref(db), updates);
     },
     delUserData() {
